@@ -3,10 +3,10 @@ return [
     'db' =>
         [
             'database_type' => 'mysql',
-            'database_name' => 'u0412966_testapi',
+            'database_name' => 'testapi',
             'server' => 'localhost',
-            'username' => 'u0412966_default',
-            'password' => 'Xz1u!!Zt',
+            'username' => 'root',
+            'password' => '',
             'charset' => 'utf8',
         ],
     'api' =>

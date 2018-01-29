@@ -95,13 +95,16 @@ class App
                     if (method_exists($api, $action)) {
                         $api->beforeAction();
                         $reflection = new \ReflectionMethod($api, $action);
-                        if (isset($arguments['id']) && $arguments['id'] != "" && $reflection->getNumberOfParameters() == 1) {
-                            return $api->$action($arguments['id']);
-                        } elseif($reflection->getNumberOfParameters() == 0){
-                            return $api->$action();
-                        }else{
-                          throw new \Exception('Не передан обязательный параметр id', 500);
+                        $parameters = $reflection->getParameters();
+                        $required_parameters = [];
+                        foreach($parameters as $param){
+                          if($param->isDefaultValueAvailable()) $required_parameters[$param->getPosition()] = $param->getDefaultValue();
+                          if(array_key_exists($param->name, $arguments) && trim($arguments[$param->name])) $required_parameters[$param->getPosition()] = $arguments[$param->name];
+                          if(!$param->isOptional() && !isset($required_parameters[$param->getPosition()])) throw new \Exception('Не передан обязательный параметр ' . $param->getName(), 500);
                         }
+
+                        return $reflection->invokeArgs($api, $required_parameters);
+
                     }else{
                         throw new \Exception('Такой action в данном методе не найден', 404);
                     }
